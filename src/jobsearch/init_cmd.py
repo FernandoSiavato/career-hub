@@ -43,6 +43,10 @@ TEMPLATE_FILES: list[tuple[str, str]] = [
     ("roles/CLAUDE.md", "roles/CLAUDE.md"),
     ("work_experience/CLAUDE.md", "work_experience/CLAUDE.md"),
     ("documentation_hub/CLAUDE.md", "documentation_hub/CLAUDE.md"),
+    (
+        "documentation_hub/_template/case-study-template.md",
+        "documentation_hub/_template/case-study-template.md",
+    ),
     ("certificates/CLAUDE.md", "certificates/CLAUDE.md"),
     ("personal_brand/CLAUDE.md", "personal_brand/CLAUDE.md"),
     ("applications/CLAUDE.md", "applications/CLAUDE.md"),

@@ -23,15 +23,17 @@ One folder per project:
 
 ```
 documentation_hub/
+  _template/
+    case-study-template.md         # the structured interview, never edit
   2024_acme_dbt_migration/
-    README.md            # overview
-    context.md           # what came before, what was broken
-    approach.md          # how you decided what to build
-    results.md           # KPIs, before/after, who adopted it
-    artifacts/           # screenshots, sample SQL, dashboard PDFs
+    README.md                      # final polished case study
+    context.md                     # what came before, what was broken
+    approach.md                    # how you decided what to build
+    results.md                     # KPIs, before/after, who adopted it
+    artifacts/                     # screenshots, sample SQL, dashboard PDFs
 ```
 
-Or, for shorter case studies, a single markdown file:
+For shorter case studies, a single markdown file works fine:
 
 ```
 documentation_hub/
@@ -39,45 +41,63 @@ documentation_hub/
   2023_betacorp_onboarding_redesign.md
 ```
 
-## README.md / single-file template
+## The 9-section template
 
-```markdown
-# Project: Acme dbt migration
+`_template/case-study-template.md` contains the canonical structure used by
+the AI: 9 sections from project context to portfolio metadata, plus an
+output-rules block telling the AI how to turn the answers into a polished
+case study.
 
-**When:** Q2-Q3 2024 (4 months)
-**Where:** Acme Inc. (employer)
-**My role:** lead analyst (1 of 2)
-
-## Problem
-Marketing reports took 3 days, broke on every event rename.
-
-## Approach
-Modeled events in dbt, version-controlled, schema tests on every model.
-Trade-off: slower initial build vs predictable maintenance.
-
-## Result
-- Turn-around: 3 days → 2 hours.
-- Zero broken reports in 6 months.
-- 3 teams adopted the same pattern.
-- Executive review meeting cut from 90 to 45 minutes.
-
-## What I would do differently
-Start with the dashboards-side first to surface naming conflicts earlier.
-
-## Stack
-Postgres, dbt 1.7, GitHub Actions for tests, Looker.
-```
+The template is meant to be **filled in iteratively, with the AI as your
+interviewer** — not copied blank and stared at.
 
 ## How an AI should help here
 
-- **Writing a case study:** the user describes the project; the AI
-  organizes the story into the structure above. Push for the
-  "trade-offs" and "what I would do differently" sections — these are
-  what differentiate a senior engineer from a juniors one in interviews.
-- **Picking a case study to cite:** when the AI is generating a cover
-  letter, it should scan this folder, pick the case whose **Result**
-  section quotes the highest-impact number relevant to the JD, and link
-  to it inside the cover letter without copying the whole thing.
-- **Privacy:** if the user wants to publish their career-hub data dir
-  (rare but possible), strip employer names and put them in a separate
-  `_public/` subfolder rather than editing the originals.
+This is the most important section in this file. Read it before doing
+anything.
+
+### Writing a new case study
+
+The user almost never sits down to fill 50 questions. Real flow:
+
+1. **Read what they already have first.** Pull from `work_experience/`,
+   any project READMEs in the repo, prior notes, even commit messages or
+   LinkedIn posts they paste. Pre-fill every section you can.
+2. **Show them what you found** before asking anything new. "I see this
+   project in your work_experience as X with metric Y — is that the same
+   one?" This earns trust and avoids redundant typing.
+3. **Ask only the questions where the answer is missing or shallow.**
+   Prioritize the gaps that matter most for interviews:
+   - The **problem framing** (Section 2)
+   - The **decisions and trade-offs** (Section 3)
+   - The **quantified results** (Section 6)
+   These are the senior-vs-mid differentiators.
+4. **Probe vague answers.** If they say "the system was slow", ask: "Slow
+   how — first-byte latency? p95? time-to-render? What was the number
+   before and after?" Same for "users were happy", "team adopted it",
+   "improved performance".
+5. **Offer architecture and diagrams.** If they describe a system in prose
+   but never drew it, propose a mermaid component diagram or sequence
+   diagram and sketch it in the case study. Architecture diagrams are
+   high-leverage portfolio content.
+6. **Save progress.** Every few questions, write what you have to the case
+   study file. Treat the template as a working document, not a one-shot
+   form.
+7. **Mark unknowns as `?`.** Never invent metrics, dates, names, or stack
+   details. When 80% of the sections are filled and the gaps are minor,
+   move to writing the polished case study using the output rules at the
+   bottom of the template.
+
+### Picking a case study to cite (during `/apply`)
+
+When generating a cover letter or fit report, scan this folder and pick
+the case whose **Result** section quotes the highest-impact number
+relevant to the JD. Link to it inside the cover letter without copying
+the whole thing.
+
+### Privacy
+
+If the user wants to publish their career-hub data dir (rare but
+possible), strip employer names and put them in a `_public/` subfolder
+rather than editing the originals. Direct quotes from teammates should
+be paraphrased unless the person gave explicit permission to publish.

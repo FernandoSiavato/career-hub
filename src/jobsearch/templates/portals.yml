@@ -1,0 +1,59 @@
+# career-hub portal scanner config
+# ---------------------------------------------------------------------------
+# This file declares the companies and Apify actors the scanner should query.
+# Run with:  career-hub scan
+#
+# Two sources are supported:
+#
+#   1. Free ATS APIs — Greenhouse, Ashby, Lever. Just set ats_slug.
+#   2. Apify Actors  — for portals without a public ATS API. Requires APIFY_TOKEN.
+#
+# `profile` is a free-form tag used to filter scans (e.g. data, product, meal).
+# `title_filters.include` and `.exclude` are case-insensitive substrings.
+# `enabled: false` skips an entry without removing it.
+
+companies:
+  - name: Anthropic
+    ats: greenhouse
+    ats_slug: anthropic
+    profile: data
+    enabled: true
+    title_filters:
+      include:
+        - data
+        - analyst
+        - python
+      exclude:
+        - intern
+        - principal
+        - staff
+
+  - name: Stripe
+    ats: greenhouse
+    ats_slug: stripe
+    profile: product
+    enabled: false
+    title_filters:
+      include:
+        - product manager
+        - product
+      exclude:
+        - intern
+        - vp
+
+  - name: Vercel
+    ats: ashby
+    ats_slug: vercel
+    profile: data
+    enabled: false
+
+# Apify actors are optional. Uncomment and set APIFY_TOKEN in your .env.
+# actors:
+#   - name: LinkedIn Jobs (data)
+#     slug: bebity~linkedin-jobs-scraper
+#     profile: data
+#     enabled: false
+#     run_input:
+#       title: "data analyst"
+#       location: "Remote"
+#       rows: 50

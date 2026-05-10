@@ -1,0 +1,21 @@
+# Default .gitignore for a career-hub data directory.
+# If you keep your career-hub data in a private git repo, this protects
+# you from accidentally committing secrets and the SQLite database.
+
+# Secrets
+.env
+.env.local
+
+# SQLite tracker (rebuildable from your applications/ folder)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# OS / editor noise
+.DS_Store
+desktop.ini
+~$*
+*.tmp
+.vscode/
+.idea/

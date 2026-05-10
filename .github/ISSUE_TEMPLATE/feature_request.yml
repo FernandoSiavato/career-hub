@@ -1,0 +1,45 @@
+name: Feature request
+description: Suggest an improvement or new capability for career-hub.
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the user pain or workflow gap, not the implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How would you like career-hub to behave? Be concrete.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you thought about and why you ruled them out.
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Which area does this touch?
+      multiple: true
+      options:
+        - CLI (`career-hub` command)
+        - Skill `/apply`
+        - Fit analyzer / profiles
+        - Scanner (ATS / Apify)
+        - Templates / CLAUDE.md guides
+        - Documentation
+        - CI / packaging
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Mockups, prior art, links to related issues.

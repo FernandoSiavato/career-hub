@@ -1,11 +1,25 @@
-# profiles/ — your professional profiles
+# profiles/ — the epicenter
 
-Each `PROFILE_*.md` here describes one angle of your career: skills you can
-sell, years of experience, narrative voice, and the keywords that should
-surface in CVs and cover letters when you apply for that kind of role.
+This is the most important folder in career-hub. Every `PROFILE_<ROLE>.md`
+is the single document the CLI and the `/apply` skill consult when scoring
+a JD and writing applications. The YAML frontmatter is the contract; the
+markdown body below it is your narrative.
 
-The career-hub CLI and the `/apply` skill read these files. The YAML
-frontmatter is the contract; the markdown body below is your narrative.
+## Use the question bank
+
+When the user asks "interview me for my data profile" or "let's refresh
+my MEAL profile", open **`_template/profile-interview-template.md`** and
+run it iteratively:
+
+1. Read `_brain/USER_CONTEXT.md`, `work_experience/`, and any existing
+   `PROFILE_*.md` first. Pre-fill every section you can from those
+   sources.
+2. Show the user what you already have before asking new questions.
+3. Ask only the questions whose answer is missing or shallow.
+4. Probe vague answers — "comfortable with SQL" needs a follow-up about
+   window functions, query tuning, table size.
+5. Never invent skills, years, KPIs or aliases.
+6. Save progress after every section so the user can stop and resume.
 
 ## File layout
 

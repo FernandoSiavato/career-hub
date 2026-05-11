@@ -15,6 +15,7 @@ from pathlib import Path
 # Folders created at the root of every new career-hub data directory.
 # Each maps to its purpose in CLAUDE.md.
 DATA_DIR_FOLDERS: list[str] = [
+    "_brain",
     "profiles",
     "cvs",
     "cvs/scripts",
@@ -34,6 +35,12 @@ TEMPLATE_FILES: list[tuple[str, str]] = [
     (".env.example", ".env.example"),
     ("CLAUDE.md", "CLAUDE.md"),
     ("START_HERE.md", "START_HERE.md"),
+    # _brain — persistent AI memory between sessions. INSIGHTS.md is
+    # append-only and is preserved on re-init (idempotency rule applies).
+    ("_brain/SESSION_START.md", "_brain/SESSION_START.md"),
+    ("_brain/USER_CONTEXT.md", "_brain/USER_CONTEXT.md"),
+    ("_brain/INSIGHTS.md", "_brain/INSIGHTS.md"),
+    ("_brain/CLAUDE.md", "_brain/CLAUDE.md"),
     ("profiles/PROFILE_DATA.md", "profiles/PROFILE_DATA.md"),
     ("profiles/PROFILE_PRODUCT.md", "profiles/PROFILE_PRODUCT.md"),
     # Per-folder CLAUDE.md guides — these tell any AI agent that opens the
@@ -43,13 +50,51 @@ TEMPLATE_FILES: list[tuple[str, str]] = [
     ("roles/CLAUDE.md", "roles/CLAUDE.md"),
     ("work_experience/CLAUDE.md", "work_experience/CLAUDE.md"),
     ("documentation_hub/CLAUDE.md", "documentation_hub/CLAUDE.md"),
+    ("certificates/CLAUDE.md", "certificates/CLAUDE.md"),
+    ("personal_brand/CLAUDE.md", "personal_brand/CLAUDE.md"),
+    ("applications/CLAUDE.md", "applications/CLAUDE.md"),
+    # Per-folder _template/ question banks (v2). Each runs as an iterative
+    # interview the AI uses to fill the folder's user-facing files.
+    (
+        "profiles/_template/profile-interview-template.md",
+        "profiles/_template/profile-interview-template.md",
+    ),
+    (
+        "cvs/_template/cv-structure-template.md",
+        "cvs/_template/cv-structure-template.md",
+    ),
+    (
+        "roles/_template/role-criteria-template.md",
+        "roles/_template/role-criteria-template.md",
+    ),
+    (
+        "work_experience/_template/star-interview-template.md",
+        "work_experience/_template/star-interview-template.md",
+    ),
     (
         "documentation_hub/_template/case-study-template.md",
         "documentation_hub/_template/case-study-template.md",
     ),
-    ("certificates/CLAUDE.md", "certificates/CLAUDE.md"),
-    ("personal_brand/CLAUDE.md", "personal_brand/CLAUDE.md"),
-    ("applications/CLAUDE.md", "applications/CLAUDE.md"),
+    (
+        "certificates/_template/certificate-template.md",
+        "certificates/_template/certificate-template.md",
+    ),
+    (
+        "personal_brand/_template/brand-discovery-template.md",
+        "personal_brand/_template/brand-discovery-template.md",
+    ),
+    (
+        "personal_brand/_template/voice-and-tone-template.md",
+        "personal_brand/_template/voice-and-tone-template.md",
+    ),
+    (
+        "personal_brand/_template/content-strategy-template.md",
+        "personal_brand/_template/content-strategy-template.md",
+    ),
+    (
+        "applications/_template/post-mortem-template.md",
+        "applications/_template/post-mortem-template.md",
+    ),
 ]
 
 

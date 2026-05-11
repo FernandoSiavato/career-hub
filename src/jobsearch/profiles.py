@@ -1,9 +1,10 @@
 import difflib
 import unicodedata
+from pathlib import Path
 
 import yaml
 
-from jobsearch import PROFILES_DIR
+from jobsearch import PROFILES_DIR, ROOT
 
 # ---------------------------------------------------------------------------
 # Normalization
@@ -394,3 +395,76 @@ def match_skills_against_profile(jd_skills: list[dict], profile: dict) -> list[d
             skill["proficiency_gap"] = None
         result.append(skill)
     return result
+
+
+# ---------------------------------------------------------------------------
+# Role filters (v2 scoring dimensions)
+# ---------------------------------------------------------------------------
+
+
+def _read_frontmatter(path: Path) -> dict:
+    """Return the YAML frontmatter of a markdown file or ``{}`` if absent."""
+    if not path.exists():
+        return {}
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return {}
+    if not text.startswith("---"):
+        return {}
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return {}
+    try:
+        data = yaml.safe_load(parts[1]) or {}
+    except yaml.YAMLError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+_ROLE_FILTER_KEYS = (
+    "work_modality_preference",
+    "hybrid_days_max",
+    "salary_floor",
+    "sectors_target",
+    "sectors_avoid",
+    "hard_constraints",
+)
+
+
+def load_role_filters(role: str | None = None) -> dict:
+    """Load the user's filters that feed the v2 scoring dimensions.
+
+    Resolution order, with later sources overriding earlier ones:
+
+    1. ``_brain/USER_CONTEXT.md`` — global defaults for the user.
+    2. ``roles/<role>.md`` — role-specific overrides (only the keys that
+       differ from USER_CONTEXT are written there).
+
+    Returns a dict with any subset of the keys in ``_ROLE_FILTER_KEYS`` that
+    were found. ``salary_floor`` is normalized into a single dict
+    ``{"currency": ..., "monthly": ...}`` even when the source uses a list
+    (the first entry wins; callers can extend to multi-currency later).
+    """
+    filters: dict = {}
+
+    # 1. USER_CONTEXT — global defaults.
+    user_context = _read_frontmatter(ROOT / "_brain" / "USER_CONTEXT.md")
+    for key in _ROLE_FILTER_KEYS:
+        if key in user_context:
+            filters[key] = user_context[key]
+
+    # 2. Role-specific overrides.
+    if role:
+        role_path = ROOT / "roles" / f"{role}.md"
+        role_data = _read_frontmatter(role_path)
+        for key in _ROLE_FILTER_KEYS:
+            if key in role_data:
+                filters[key] = role_data[key]
+
+    # Normalize ``salary_floor``: accept either a dict or a list of dicts.
+    floor = filters.get("salary_floor")
+    if isinstance(floor, list):
+        filters["salary_floor"] = floor[0] if floor else {}
+
+    return filters

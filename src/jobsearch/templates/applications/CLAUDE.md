@@ -1,9 +1,23 @@
-# applications/ — one folder per application (CLI-managed)
+# applications/ — the output (CLI-managed) + post-mortem feedback loop
 
 This folder is **managed by the CLI**. Every time you run `career-hub
 apply` (or trigger the `/apply` skill in Claude Code) a new subfolder
-appears here for the company you applied to. You can read these freely;
-edit only the files explicitly marked as user-editable.
+appears here for the company you applied to.
+
+## Post-mortems feed the brain
+
+After an application reaches a final status (applied, interview, offer,
+rejected, ghosted), open
+**`_template/post-mortem-template.md`** and run it. The template is
+short (one session) and produces two things:
+
+1. A `post_mortem.md` inside the application folder.
+2. **One appended entry** to `_brain/INSIGHTS.md`, dated, tagged as
+   `pattern` / `gap` / `rule`.
+
+That INSIGHTS entry is what makes the AI smarter for your next
+application. Never skip the post-mortem step — it is the system's
+feedback loop.
 
 ## Layout
 

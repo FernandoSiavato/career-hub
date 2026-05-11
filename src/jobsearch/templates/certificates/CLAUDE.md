@@ -1,8 +1,20 @@
-# certificates/ — certifications, courses, credentials
+# certificates/ — the credentials
 
 Store your verifiable credentials here so the AI can list them when a JD
 asks for specific certifications and so you have one place to look up
 expiry dates.
+
+## Use the question bank
+
+When the user adds a new credential or refreshes an existing one, open
+**`_template/certificate-template.md`** and run it (short — one
+session). The template auto-extracts what it can from the PDF or
+credential URL, then asks only for the metadata it cannot see.
+
+The output is a `certificates/<slug>/metadata.yml` with structured
+fields (title, issuer, dates, ID, verify URL, skills_proven). The
+fit_analyzer and `/apply` use `skills_proven` to surface credentials in
+cover letters when the JD asks for them.
 
 ## File layout
 

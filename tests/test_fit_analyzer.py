@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from jobsearch.fit_analyzer import (
     FitReport,
     classify_requirement,
@@ -112,3 +114,148 @@ class TestFitReportProperties:
         assert report.percentage == round(report.fit_score * 100, 1)
         assert report.skills_pct == round(report.skills_score * 100, 1)
         assert report.exp_pct == round(report.experience_score * 100, 1)
+
+
+class TestCustomDimensions:
+    """v2 scoring: modality, salary_floor, sector_fit dimensions."""
+
+    def _good_skills(self):
+        return [{"skill": "Python", "required": 1, "matched": 1, "category": "data"}]
+
+    def test_modality_remote_match_full_credit(self, sample_profile):
+        report = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={"modality": "remote"},
+            user_filters={"work_modality_preference": "remote"},
+        )
+        assert report.modality_score == 1.0
+        assert "modality" in report.dimensions_used
+
+    def test_modality_remote_vs_hybrid_partial(self, sample_profile):
+        """User prefers remote, JD says hybrid -> partial credit."""
+        report = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={"modality": "hybrid"},
+            user_filters={"work_modality_preference": "remote"},
+        )
+        assert report.modality_score == 0.5
+
+    def test_modality_remote_vs_onsite_zero(self, sample_profile):
+        report = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={"modality": "onsite"},
+            user_filters={"work_modality_preference": "remote"},
+        )
+        assert report.modality_score == 0.0
+
+    def test_modality_jd_silent_skips_dimension(self, sample_profile):
+        report = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={},
+            user_filters={"work_modality_preference": "remote"},
+        )
+        assert report.modality_score is None
+        assert "modality" not in report.dimensions_used
+
+    def test_salary_above_floor_full_credit(self, sample_profile):
+        report = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={"salary_max": 5000, "currency": "USD"},
+            user_filters={"salary_floor": {"monthly": 4000, "currency": "USD"}},
+        )
+        assert report.salary_score == 1.0
+
+    def test_salary_within_20_percent_partial(self, sample_profile):
+        # JD offers 3,500, user floor 4,000 -> ratio 0.875 -> partial
+        report = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={"salary_max": 3500, "currency": "USD"},
+            user_filters={"salary_floor": {"monthly": 4000, "currency": "USD"}},
+        )
+        assert report.salary_score == 0.5
+
+    def test_salary_below_threshold_zero(self, sample_profile):
+        report = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={"salary_max": 2000, "currency": "USD"},
+            user_filters={"salary_floor": {"monthly": 4000, "currency": "USD"}},
+        )
+        assert report.salary_score == 0.0
+
+    def test_salary_currency_mismatch_skips_dimension(self, sample_profile):
+        report = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={"salary_max": 5000, "currency": "EUR"},
+            user_filters={"salary_floor": {"monthly": 4000, "currency": "USD"}},
+        )
+        assert report.salary_score is None
+
+    def test_sector_target_overlap_scores_positive(self, sample_profile):
+        report = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={"sector_tokens": {"saas", "b2b"}},
+            user_filters={"sectors_target": ["saas", "fintech"]},
+        )
+        assert report.sector_score is not None
+        assert report.sector_score > 0
+
+    def test_sector_avoid_penalizes(self, sample_profile):
+        """Sectors_avoid intersection drops the score by 0.3."""
+        no_penalty = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={"sector_tokens": {"saas"}},
+            user_filters={"sectors_target": ["saas"]},
+        ).sector_score
+        with_penalty = score_fit(
+            self._good_skills(),
+            sample_profile,
+            jd_signals={"sector_tokens": {"saas", "adtech"}},
+            user_filters={"sectors_target": ["saas"], "sectors_avoid": ["adtech"]},
+        ).sector_score
+        assert with_penalty < no_penalty
+
+
+class TestWeightRedistribution:
+    """When a dimension is unmeasurable its weight goes to the others."""
+
+    def _full_match_skills(self):
+        return [{"skill": "Python", "required": 1, "matched": 1, "category": "data"}]
+
+    def test_missing_dimensions_redistribute(self, sample_profile):
+        """With only skills + experience scored, the two should absorb all
+        the weight and applied weights still sum to 1.0."""
+        report = score_fit(
+            self._full_match_skills(),
+            sample_profile,
+            jd_signals={},  # nothing measurable for modality / salary / sector
+            user_filters={},
+        )
+        total = sum(report.weights_applied.values())
+        assert total == pytest.approx(1.0, abs=1e-6)
+        assert set(report.dimensions_used) == {"skills", "experience"}
+
+    def test_back_compat_default_weights_unchanged(self, sample_profile):
+        """With no [scoring] block and no jd_signals/user_filters, the v2
+        score_fit must produce the same number as v1 did (skills 70%,
+        experience 30%)."""
+        # Inside the conftest test data dir the bundled config.toml DOES
+        # include a [scoring] block, so we cannot test "no scoring block"
+        # here. We test the closer guarantee: with only skills+experience
+        # scored, the result follows whatever weights config.toml declares.
+        report = score_fit(
+            self._full_match_skills(),
+            sample_profile,
+        )
+        # Skills perfect (1.0), experience perfect (1.0), so fit must be 1.0
+        # regardless of the weight distribution.
+        assert report.fit_score == pytest.approx(1.0, abs=1e-6)

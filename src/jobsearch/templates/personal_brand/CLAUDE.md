@@ -1,8 +1,26 @@
-# personal_brand/ — voice, positioning, content strategy
+# personal_brand/ — the voice
 
 This folder defines **who you are at work in your own words**, so the AI
-can write in your voice instead of generic LLM voice. Think of it as the
+writes in your voice instead of generic LLM voice. Think of it as the
 style guide for cover letters, LinkedIn posts, and bio paragraphs.
+
+## Use the question banks
+
+Three templates live in `_template/`, each answering a different
+question. Run them in this order:
+
+1. **`brand-discovery-template.md`** — *who do I help, with what, and
+   why me?* Runs the Skills × Interests × Market needs framework. Output:
+   `brand_discovery.md` + a draft `brand_statement.md`.
+2. **`voice-and-tone-template.md`** — *how do I sound when I write?*
+   Extracts patterns from 3-5 samples of the user's own writing and
+   produces prescriptive Always/Never rules in `voice_and_tone.md`.
+3. **`content-strategy-template.md`** — *what do I publish and when?*
+   Defines audience, pillars, cadence, and hard rules.
+
+Run each iteratively. The voice template is the highest-leverage one for
+cover letters; the discovery and strategy templates support longer-term
+content work.
 
 ## Recommended files
 

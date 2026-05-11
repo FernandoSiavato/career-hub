@@ -54,12 +54,14 @@ That's it. The AI reads your profile, picks the right CV, builds a cover letter 
 ```
                 ┌─────────────────────────────────────┐
                 │      Your career data directory     │
-                │  profiles/  cvs/  work_experience/  │
-                │  certificates/  documentation_hub/  │
-                │  personal_brand/  applications/     │
+                │  _brain/  profiles/  cvs/  roles/   │
+                │  work_experience/  certificates/    │
+                │  documentation_hub/  personal_brand/│
+                │  applications/                      │
                 │                                     │
                 │       Every folder ships with       │
-                │      its own CLAUDE.md guide.       │
+                │   its own CLAUDE.md + _template/    │
+                │     (a structured question bank).   │
                 └────────┬────────────────────┬───────┘
                          │                    │
                          ▼                    ▼
@@ -76,7 +78,14 @@ That's it. The AI reads your profile, picks the right CV, builds a cover letter 
 
 1. **CLI `career-hub`** — fit analysis, CV personalization, cover letter, optional dynamic job scanning across ATS portals (Greenhouse, Ashby, Lever, Apify).
 2. **Skill `/apply`** for Claude Code — orchestrates a full application end to end: reads the JD, picks the right profile, calculates a fit score, generates the cover letter and a CV-tailoring script, and only asks you for the data it cannot infer.
-3. **Folder convention with per-folder `CLAUDE.md`** — every folder explains itself to any AI that opens it. No manual setup of agent context.
+3. **Folder convention with per-folder `CLAUDE.md` + `_template/` question banks** — every folder explains itself to any AI that opens it. The AI runs the templates as iterative interviews rather than blank forms.
+
+## 🧠 What's new in v2
+
+- **`_brain/` folder** — persistent memory between AI sessions. `SESSION_START.md` is the preload checklist, `USER_CONTEXT.md` is the canonical user record, `INSIGHTS.md` is an append-only log of patterns the AI learns from each postulation.
+- **One `_template/` per folder** — every folder ships a structured question bank (profile, STAR interview, CV planning, role criteria, brand discovery, voice & tone, content strategy, certificate intake, application post-mortem, case study). The AI runs them iteratively: read first, ask only the gaps, probe vague answers, never invent.
+- **Custom fit scoring** — `[scoring.weights]` in `config.toml` lets you weigh **skills**, **experience**, **modality**, **salary_floor**, and **sector_fit**. The analyzer auto-extracts modality / salary / sector signals from the JD and combines them with your filters from `roles/<role>.md` and `_brain/USER_CONTEXT.md`. Dimensions the JD does not mention are dropped and their weight is redistributed — every score is explainable.
+- **Phase-based onboarding** — `START_HERE.md` walks new users through Phases 0-5 (wire the brain → epicenter profile → STAR history → voice → custom scoring → apply & log) with explicit success indicators per phase.
 
 ---
 
@@ -98,23 +107,31 @@ After `career-hub init`:
 
 ```
 your-career-hub/
-├── profiles/             # Your professional profiles (skills, narrative, fit rules)
-├── cvs/                  # CV templates by role and language
-├── roles/                # Role families and sectors you target
-├── work_experience/      # Career history in STAR format with KPIs
-├── documentation_hub/    # Past projects as reusable case studies
-│   └── _template/        # 9-section interview the AI uses with you
-├── certificates/         # Certifications, courses, credentials
-├── personal_brand/       # Brand statement, voice and tone, content strategy
-├── applications/         # Generated, one folder per company
-├── jobsearch.db          # SQLite tracker
-├── portals.yml           # Companies / ATS to scan
-├── config.toml           # Roles, fit threshold, CV mapping
-├── CLAUDE.md             # Root AI guide
-└── START_HERE.md         # 5-minute human quickstart (no AI required)
+├── _brain/                # Persistent AI memory (SESSION_START, USER_CONTEXT, INSIGHTS)
+├── profiles/              # The epicenter: skills, narrative, fit rules per role
+│   └── _template/         # Profile interview question bank (7 sections)
+├── cvs/                   # CV templates by role and language
+│   └── _template/         # CV structure planning template
+├── roles/                 # Role-specific filters: modality, salary, sectors
+│   └── _template/         # Role criteria question bank
+├── work_experience/       # Career history in STAR format with KPIs
+│   └── _template/         # STAR interview template (per-role)
+├── documentation_hub/     # Past projects as reusable case studies
+│   └── _template/         # 9-section case-study interview
+├── certificates/          # Certifications, courses, credentials
+│   └── _template/         # Certificate intake question bank
+├── personal_brand/        # Brand statement, voice and tone, content strategy
+│   └── _template/         # 3 interviews: discovery, voice, strategy
+├── applications/          # Generated, one folder per company
+│   └── _template/         # Post-mortem template (feeds INSIGHTS.md)
+├── jobsearch.db           # SQLite tracker
+├── portals.yml            # Companies / ATS to scan
+├── config.toml            # Roles, fit threshold, custom scoring weights
+├── CLAUDE.md              # Root AI guide (session preload + folder tour)
+└── START_HERE.md          # Phase-based onboarding (no AI required)
 ```
 
-Every subfolder has a `CLAUDE.md` describing **what lives there, what to expect, and how an AI should help you fill it**. The AI doesn't need extra prompting — opening the folder is enough.
+Every subfolder has a `CLAUDE.md` describing **what lives there, what to expect, and how an AI should help you fill it** — plus a `_template/` with the structured question bank the AI runs as an iterative interview.
 
 ---
 

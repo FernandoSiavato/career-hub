@@ -9,6 +9,19 @@ Two things live here:
    skill writes one Python script per company (`gen_cv_<company>.py`) that
    builds a tailored DOCX from your profile + the JD's keywords.
 
+## Use the question bank
+
+When the user wants to plan a new base CV (different role, different
+audience, fresh layout), open **`_template/cv-structure-template.md`**
+and run it iteratively. The template plans the DOCX — it does **not**
+write the DOCX itself. The user hand-edits the DOCX afterward following
+the plan you produce at `cvs/_template/PLAN_<ROLE>.md`.
+
+The template enforces three things the personalizer script depends on:
+the `<COMPANY>` placeholder, the `## Highlights` heading, and the
+`## Why <COMPANY>` heading. If the user's DOCX is missing those, the
+plan must call it out before they save.
+
 ## Naming convention
 
 ```

@@ -66,3 +66,70 @@ class TestRunInit:
             "files_written",
             "files_skipped",
         }
+
+
+class TestBrainFolder:
+    """The _brain/ folder holds persistent memory between AI sessions."""
+
+    def test_brain_folder_present(self, tmp_path: Path):
+        run_init(tmp_path / "fresh")
+        brain = tmp_path / "fresh" / "_brain"
+        assert brain.is_dir()
+        for name in ("SESSION_START.md", "USER_CONTEXT.md", "INSIGHTS.md", "CLAUDE.md"):
+            target = brain / name
+            assert target.is_file(), f"missing {name}"
+            assert target.read_text(encoding="utf-8").strip(), f"{name} is empty"
+
+    def test_insights_not_overwritten_on_reinit(self, tmp_path: Path):
+        """Re-init without --force must preserve INSIGHTS.md so the AI never
+        loses learnings from past postulations."""
+        target = tmp_path / "fresh"
+        run_init(target)
+        insights = target / "_brain" / "INSIGHTS.md"
+        insights.write_text("CUSTOM MANUAL NOTE", encoding="utf-8")
+        run_init(target)  # second init, no force
+        assert insights.read_text(encoding="utf-8") == "CUSTOM MANUAL NOTE"
+
+    def test_force_overwrites_brain_files(self, tmp_path: Path):
+        """With force=True the brain folder is reset to the bundled template."""
+        target = tmp_path / "fresh"
+        run_init(target)
+        insights = target / "_brain" / "INSIGHTS.md"
+        insights.write_text("CUSTOM MANUAL NOTE", encoding="utf-8")
+        run_init(target, force=True)
+        assert insights.read_text(encoding="utf-8") != "CUSTOM MANUAL NOTE"
+
+
+class TestPerFolderTemplates:
+    """Every user-facing folder ships an interview template (question bank)
+    in its ``_template/`` subdirectory."""
+
+    EXPECTED_TEMPLATES = [
+        "profiles/_template/profile-interview-template.md",
+        "cvs/_template/cv-structure-template.md",
+        "roles/_template/role-criteria-template.md",
+        "work_experience/_template/star-interview-template.md",
+        "documentation_hub/_template/case-study-template.md",
+        "certificates/_template/certificate-template.md",
+        "personal_brand/_template/brand-discovery-template.md",
+        "personal_brand/_template/voice-and-tone-template.md",
+        "personal_brand/_template/content-strategy-template.md",
+        "applications/_template/post-mortem-template.md",
+    ]
+
+    def test_all_per_folder_templates_copied(self, tmp_path: Path):
+        run_init(tmp_path / "fresh")
+        target = tmp_path / "fresh"
+        for rel in self.EXPECTED_TEMPLATES:
+            f = target / rel
+            assert f.is_file(), f"missing {rel}"
+            assert f.read_text(encoding="utf-8").strip(), f"{rel} is empty"
+
+    def test_templates_have_ai_preamble(self, tmp_path: Path):
+        """Every interview template must open with a "For the AI:" block so
+        any agent that opens it knows how to use it."""
+        run_init(tmp_path / "fresh")
+        target = tmp_path / "fresh"
+        for rel in self.EXPECTED_TEMPLATES:
+            content = (target / rel).read_text(encoding="utf-8")
+            assert "**For the AI:**" in content, f"{rel} missing AI preamble"

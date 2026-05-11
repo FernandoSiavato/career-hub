@@ -38,8 +38,9 @@ JD_FILENAMES = [
     "descripcion.pdf",
 ]
 
-FIT_THRESHOLD = 0.70
-SKILL_WEIGHTS = {"skills": 0.7, "experience": 0.3}
+# v1 defaults — used when ``[scoring]`` is absent from the user's config.
+_V1_THRESHOLD = 0.70
+_V1_WEIGHTS: dict[str, float] = {"skills": 0.70, "experience": 0.30}
 
 
 # ---------------------------------------------------------------------------
@@ -134,3 +135,61 @@ CV_TEMPLATES: dict[str, dict[str, Path]] = {
     role: {lang: ROOT / rel for lang, rel in (cfg.get("cv_templates") or {}).items()}
     for role, cfg in _CONFIG.get("roles", {}).items()
 }
+
+
+# ---------------------------------------------------------------------------
+# Custom scoring (v2).
+#
+# Users define how `career-hub fit` weighs the dimensions of a fit score in
+# the ``[scoring]`` block of config.toml. Weights need not sum to 1.0; the
+# analyzer normalizes. Missing dimensions get their weight redistributed
+# across the dimensions actually scored.
+# ---------------------------------------------------------------------------
+
+# Canonical set of dimensions the analyzer knows about. New dimensions can be
+# added here and in fit_analyzer.score_fit without touching user configs.
+SCORING_DIMENSIONS: tuple[str, ...] = (
+    "skills",
+    "experience",
+    "modality",
+    "salary_floor",
+    "sector_fit",
+)
+
+
+def scoring_config() -> dict:
+    """Full ``[scoring]`` block as a dict, or an empty dict if absent."""
+    return dict(_CONFIG.get("scoring", {}))
+
+
+def scoring_threshold() -> float:
+    """The user's threshold for "apply" vs "review gaps", in [0, 1]."""
+    return float(scoring_config().get("threshold", _V1_THRESHOLD))
+
+
+def scoring_weights() -> dict[str, float]:
+    """Return the user's scoring weights, normalized to sum to 1.0.
+
+    If ``[scoring.weights]`` is absent or empty, falls back to v1 weights
+    (skills 0.70, experience 0.30). Unknown dimensions are dropped. The
+    result preserves the order from ``SCORING_DIMENSIONS``.
+    """
+    raw = scoring_config().get("weights") or {}
+    cleaned: dict[str, float] = {}
+    for dim in SCORING_DIMENSIONS:
+        try:
+            w = float(raw[dim])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if w > 0:
+            cleaned[dim] = w
+    if not cleaned:
+        cleaned = dict(_V1_WEIGHTS)
+    total = sum(cleaned.values())
+    return {k: v / total for k, v in cleaned.items()}
+
+
+# Back-compat aliases — derived from the new helpers so existing callers
+# (older modules, tests) keep working without import changes.
+FIT_THRESHOLD: float = scoring_threshold()
+SKILL_WEIGHTS: dict[str, float] = scoring_weights()

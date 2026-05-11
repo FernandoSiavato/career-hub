@@ -1,12 +1,20 @@
-# work_experience/ — your career history (single source of truth)
+# work_experience/ — the proof (single source of truth)
 
-This folder is the **single source of truth** the AI reads to personalize
-applications. Every CV bullet and every cover letter sentence about your
-past should trace back to a file here.
+Every CV bullet and every cover letter sentence about your past must
+trace back to a file here. If a role is not documented, the AI cannot
+mention it without making things up.
 
-If a role you held is not documented here, the AI cannot mention it
-without making things up. Treat this folder as the authoritative log of
-what you have done.
+## Use the question bank
+
+When the user asks "let's document my role at Acme" or "interview me for
+my WV experience", open **`_template/star-interview-template.md`** and
+run it iteratively. One role per session. Five to ten STAR achievements
+per role is the sweet spot.
+
+The template's biggest job is **pushing for numbers**. Probe every vague
+answer ("system was slow" → "slow how, on what cohort, before vs after").
+Never invent KPIs, dates, donor names or stack details. Mark unknowns as
+`?` and revisit later.
 
 ## File layout
 

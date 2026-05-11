@@ -1,11 +1,24 @@
-# roles/ — role-family definitions
+# roles/ — the filters
 
-This folder is **optional**. Use it when you target multiple sectors with
-overlapping but distinct expectations and you want a place to write down
-the criteria you use to decide whether a role is worth applying for.
+This folder defines what the user accepts (and refuses) per role. The
+files here also feed the custom-scoring dimensions of `career-hub fit`:
+**modality**, **salary_floor**, and **sector_fit**. Each role file can
+override the global defaults in `_brain/USER_CONTEXT.md` for that
+specific role only.
 
-If you only have a couple of roles and `config.toml` is enough, leave
-this folder empty. The CLI does not require any specific files here.
+If a value matches `USER_CONTEXT.md`, **do not** repeat it in the role
+file — the fit analyzer falls back to USER_CONTEXT automatically. The
+role file should contain only overrides.
+
+## Use the question bank
+
+When the user wants to define or refine a role's filters, open
+**`_template/role-criteria-template.md`** and run it iteratively.
+Pre-fill from USER_CONTEXT first; only ask the questions where the user
+deviates from their global preferences.
+
+The output is a `roles/<role>.md` with YAML frontmatter the
+`fit_analyzer` reads via `profiles.load_role_filters(role)`.
 
 ## What to put here
 

@@ -52,9 +52,10 @@ Changelog = "https://github.com/fernandosiavato/career-hub/blob/main/CHANGELOG.m
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/jobsearch"]
-
-[tool.hatch.build.targets.wheel.force-include]
-"src/jobsearch/templates" = "jobsearch/templates"
+# Note: ``packages`` already includes ``src/jobsearch/templates`` as a
+# subdirectory. A previous ``force-include`` block packed it a second
+# time, producing duplicate ZIP entries that PyPI rejected with
+# ``HTTP 400 — Invalid distribution file``. Do not re-add it.
 
 [tool.ruff]
 line-length = 100

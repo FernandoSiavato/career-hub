@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-05-11
+
+First successful PyPI release. ``v0.1.0`` was tagged twice and both
+attempts were rejected by PyPI; ``v0.1.1`` is the version that actually
+ships.
+
+### Fixed
+- ``pyproject.toml``: removed a ``[tool.hatch.build.targets.wheel.force-include]``
+  block that re-packed ``src/jobsearch/templates`` on top of the regular
+  ``packages = ["src/jobsearch"]`` sweep. The duplicate entries produced
+  a wheel that PyPI rejected with ``HTTP 400 — Invalid distribution file``.
+
 ## [Unreleased]
 
 ### Added
